@@ -1,9 +1,12 @@
+import configparser
 import itertools
 import urllib.request
 
+import click
 import systemd.journal
 
 from .client import CloudWatchClient
+from .version import version
 
 
 def get_instance_id():
@@ -12,37 +15,64 @@ def get_instance_id():
         return src.read().decode()
 
 
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--cursor', required=True,
-                        help='Store/read the journald cursor in this file')
-    parser.add_argument('--logs', default='/var/log/journal',
-                        help='Directory to journald logs'
-                        ' (default: %(default)s)')
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('--prefix', default='',
-                       help='Log group prefix (default is blank).'
-                       ' Log group will be {prefix}_{instance_id}')
-    group.add_argument('--log-group',
-                       help='Name of the log group to use')
-    parser.add_argument('--retention', type=int, default=0,
-                        help='Set retention duration of log_group in days.'
-                        ' Only when log group is created.'
-                        ' %(default)s means infinite')
-    args = parser.parse_args()
+def print_version(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+    click.echo('Version {}'.format(version))
+    ctx.exit()
 
-    if args.log_group:
-        log_group = args.log_group
+
+@click.command()
+@click.option('--cursor', help='Store/read the journald cursor in this file')
+@click.option('--logs', default='/var/log/journal',
+              help='Directory to journald logs (default: /var/log/journal)')
+@click.option('--prefix', default='',
+              help='Log group prefix (default is blank).'
+              ' Log group will be {prefix}_{instance_id}')
+@click.option('--log-group', help='Name of the log group to use')
+@click.option('--retention',
+              type=click.Choice(
+                  [str(i) for i in (0, 1, 3, 5, 7, 14, 30, 60, 90, 120, 150,
+                                    180, 365, 400, 545, 731, 1827, 3653)]),
+              default='0',
+              help='Set retention duration of log_group in days.'
+              ' Only when log group is created. 0 means infinite')
+@click.option('--config', help='Path to config file', type=click.Path())
+@click.option('--version', is_flag=True, callback=print_version,
+              expose_value=False, is_eager=True)
+def main(cursor, logs, prefix, log_group, retention, config):
+    if config:
+        config_ = configparser.ConfigParser()
+        config_.read(config)
+        section = config_['jd2cw']
+        cursor = section['cursor']
+        logs = section.get('logs', '/var/log/journal')
+        try:
+            log_group = section['log-group']
+        except KeyError:
+            log_group = get_instance_id()
+            try:
+                prefix = section['prefix']
+            except KeyError:
+                pass
+            else:
+                log_group = '{}_{}'.format(prefix, log_group)
+        log_group = log_group
+        retention = section.get('retention', 0)
     else:
-        log_group = get_instance_id()
-        if args.prefix:
-            log_group = '{}_{}'.format(args.prefix, log_group)
+        cursor = cursor
+        logs = logs
+        if not log_group:
+            log_group = get_instance_id()
+        if prefix:
+            log_group = '{}_{}'.format(prefix, log_group)
+        log_group = log_group
+        retention = int(retention)
 
-    client = CloudWatchClient(log_group, args.cursor, args.retention)
+    client = CloudWatchClient(log_group, cursor, retention)
 
     cursor = client.load_cursor()
-    with systemd.journal.Reader(path=args.logs) as reader:
+    with systemd.journal.Reader(path=logs) as reader:
         if cursor:
             reader.seek_cursor(cursor)
         else:
@@ -50,10 +80,13 @@ def main():
             reader.this_boot()
             reader.seek_head()
 
-        while True:
-            for log_stream, messages in itertools.groupby(
-                    filter(CloudWatchClient.retain_message, reader),
-                    key=client.log_stream_for):
-                client.log_messages(log_stream, list(messages))
-            else:
-                reader.wait(.1)
+        try:
+            while True:
+                for log_stream, messages in itertools.groupby(
+                        filter(CloudWatchClient.retain_message, reader),
+                        key=client.log_stream_for):
+                    client.log_messages(log_stream, list(messages))
+                else:
+                    reader.wait(.1)
+        except KeyboardInterrupt:
+            pass
