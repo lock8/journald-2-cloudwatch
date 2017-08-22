@@ -1,0 +1,5 @@
+FROM journald-2-cloudwatch
+
+RUN apt-get update && apt-get install --no-install-recommends --yes python3-pip python3-setuptools
+RUN pip3 --no-cache-dir install pytest pytest-cov codecov requests_mock
+ENTRYPOINT ["pytest", "--cov=jd2cw"]
