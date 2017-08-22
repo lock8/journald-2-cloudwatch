@@ -129,7 +129,8 @@ class CloudWatchClient:
             seq_token = self.get_seq_token(log_stream)
 
         kwargs = (dict(sequenceToken=seq_token) if seq_token else {})
-        log_events = list(map(self.make_message, messages))
+        log_events = sorted(map(self.make_message, messages),
+                            key=lambda x: x['timestamp'])
 
         MAX_RETRY = 5
         counter = 0

@@ -1,3 +1,4 @@
+import datetime as dt
 import json
 import urllib.parse
 import uuid
@@ -92,14 +93,20 @@ def test_client_log_messages(client, now):
              },
             {'json': {'nextSequenceToken': 'abcd'}},
         ])
+        first_ts = now
+        second_ts = now - dt.timedelta(seconds=1)
         client.log_messages('stream', [
             {'MESSAGE': 'message1',
-             '__REALTIME_TIMESTAMP': now,
+             '__REALTIME_TIMESTAMP': first_ts,
              '__CURSOR': 'cur1',
              },
             {'MESSAGE': 'message2',
-             '__REALTIME_TIMESTAMP': now,
+             '__REALTIME_TIMESTAMP': second_ts,
              '__CURSOR': 'cur2',
              },
         ])
     assert m.call_count == 2
+    assert [e['timestamp']
+            for e in m.request_history[1].json()['logEvents']] == [
+                    int(second_ts.timestamp() * 1000),
+                    int(first_ts.timestamp() * 1000)]
