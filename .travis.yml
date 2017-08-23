@@ -2,19 +2,14 @@ language: python
 dist: trusty
 sudo: false
 services:
-    - docker
-
-before_install:
-    - make docker_build
-install:
-    - make docker_build_test
+  - docker
 
 script:
-    - CODECOV_TMP=$(mktemp -d)
-    - CODECOV_TMP=$CODECOV_TMP make docker_test
+  - CODECOV_TMP=$(mktemp -d)
+  - CODECOV_TMP=$CODECOV_TMP make docker_test
 
 after_success:
-    - bash <(curl -s https://codecov.io/bash) -X gcov -X coveragepy -f $CODECOV_TMP/coverage.xml
+  - bash <(curl -s https://codecov.io/bash) -X gcov -X coveragepy -f $CODECOV_TMP/coverage.xml
 
 notifications:
-    email: false
+  email: false
