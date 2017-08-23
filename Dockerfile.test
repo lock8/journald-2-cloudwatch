@@ -1,4 +1,4 @@
 FROM journald-2-cloudwatch
 
 RUN pip3 --no-cache-dir install pytest pytest-cov codecov requests_mock
-ENTRYPOINT ["pytest", "/jd2cw/tests", "--cov=jd2cw", "--cov-report=term", "--cov-report=xml:/tmp/codecov/coverage.xml"]
+ENTRYPOINT ["pytest", "/jd2cw/tests", "-vv", "--cov=jd2cw", "--cov-report=term", "--cov-report=xml:/tmp/codecov/coverage.xml"]
