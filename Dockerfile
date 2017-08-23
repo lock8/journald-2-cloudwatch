@@ -7,9 +7,8 @@ ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 # Install Python, pip, boto3 and python-systemd.
-RUN BUILD_DEPS="curl python3-dev pkg-config \
-      gcc git libsystemd-dev" \
-    VERSION="233"; \
+RUN BUILD_DEPS="curl python3-dev pkg-config gcc git libsystemd-dev" \
+    VERSION="234"; \
     apt-get update && \
     apt-get install --no-install-recommends --yes python3 \
       python3-pip python3-setuptools $BUILD_DEPS && \
