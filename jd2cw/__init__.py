@@ -100,11 +100,10 @@ def main(cursor, logs, prefix, log_group, retention, config):
 
         try:
             while True:
+                reader.wait()
                 for log_stream, messages in itertools.groupby(
                         filter(CloudWatchClient.retain_message, reader),
                         key=client.log_stream_for):
                     client.log_messages(log_stream, list(messages))
-                else:
-                    reader.wait(.1)
         except KeyboardInterrupt:
             pass
