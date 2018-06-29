@@ -110,3 +110,20 @@ def test_client_log_messages(client, now):
             for e in m.request_history[1].json()['logEvents']] == [
                     int(second_ts.timestamp() * 1000),
                     int(first_ts.timestamp() * 1000)]
+
+def test_client_group_messages(client, now):
+    messages = []
+    for x in range(11):
+        messages.append({'__REALTIME_TIMESTAMP': now})
+    x = len(list(client.group_messages(messages,2,dt.timedelta(hours=12))))
+    assert x == 6
+    ts_1 = now
+    ts_2 = now + dt.timedelta(hours=24)
+    ts_3 = now - dt.timedelta(hours=24)
+    messages = [
+        {'__REALTIME_TIMESTAMP': ts_1,},
+        {'__REALTIME_TIMESTAMP': ts_2,},
+        {'__REALTIME_TIMESTAMP': ts_3,},
+    ]
+    x = len(list(client.group_messages(messages,3,dt.timedelta(hours=23))))
+    assert x == 3
