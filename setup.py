@@ -35,6 +35,15 @@ setup(
     url='https://github.com/lock8/journald-2-cloudwatch',
     packages=('jd2cw',),
     install_requires=['boto3', 'click'],
+    extras_require={
+        # Also: git+https://github.com/systemd/python-systemd.git#egg=systemd
+        'testing': [
+            'pytest', 'pytest-cov', 'requests_mock',
+            # Pin botocore to make current tests work.
+            # https://github.com/lock8/journald-2-cloudwatch/issues/30.
+            'botocore==1.10.84',
+        ],
+    },
     include_package_data=True,
     entry_points="""
     [console_scripts]

@@ -2,7 +2,7 @@ FROM journald-2-cloudwatch
 
 RUN apt-get update \
   && apt-get install --no-install-recommends -y python3-pip \
-  && pip3 --no-cache-dir install pytest pytest-cov requests_mock \
+  && pip3 --no-cache-dir install '.[testing]' \
   && apt-get purge -y python3-pip \
   && apt-get autoremove -y --purge \
   && rm -rf /var/lib/apt/lists/*
