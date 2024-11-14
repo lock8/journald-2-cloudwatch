@@ -28,8 +28,7 @@ ENV PATH="/jd2cw/venv/bin:$PATH"
 
 # Install dependencies in the virtual environment
 RUN pip install --upgrade pip \
-  && pip install --no-cache-dir -e . \
-  && pip install --no-cache-dir pytest
+  && pip install --no-cache-dir -e .
 
 # Clean up unnecessary packages to reduce image size
 RUN apt purge -y python3-pip \
