@@ -33,12 +33,6 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Set up Docker
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y docker.io
-        sudo systemctl start docker
-
     - name: Create temporary directory for coverage
       run: |
         CODECOV_TMP=$(mktemp -d)
