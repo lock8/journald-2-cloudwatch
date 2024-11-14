@@ -6,14 +6,19 @@ VOLUME /etc/jd2cw/
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
+ENV DEBIAN_FRONTEND=noninteractive \
+  DEBCONF_NONINTERACTIVE_SEEN=true \
+  PYTHONUNBUFFERED=1
+
 RUN mkdir /jd2cw
 WORKDIR /jd2cw
 COPY jd2cw /jd2cw/jd2cw
 COPY setup.py /jd2cw/
 
 RUN apt update -y \
-  && apt install --no-install-recommends -y python3-minimal python3-systemd python3-pip python3-setuptools \
-  && pip3 install --no-cache-dir -e . \
+  && apt install --no-install-recommends -y python3-minimal python3-systemd python3-pip python3-setuptools
+
+RUN pip3 install --no-cache-dir -e . \
   && apt purge -y python3-pip \
   && apt autoremove -y --purge \
   && rm -rf /var/lib/apt/lists/*
