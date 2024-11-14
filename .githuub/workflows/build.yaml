@@ -1,0 +1,65 @@
+on:
+  push:
+    branches:
+      - new-build
+
+env:
+  AWS_REGION: eu-west-1
+  ECR_REPOSITORY: journald-2-cloudwatch
+
+name: build
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.LOCK8_WORKFLOW_AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.LOCK8_WORKFLOW_AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+  
+    - name: Login to Amazon ECR
+      id: login-ecr-lock8
+      uses: aws-actions/amazon-ecr-login@v1
+  
+    - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+    - name: Set up Docker
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker.io
+        sudo systemctl start docker
+
+    - name: Create temporary directory for coverage
+      run: |
+        CODECOV_TMP=$(mktemp -d)
+        echo "CODECOV_TMP=$CODECOV_TMP" >> $GITHUB_ENV
+
+    - name: Run docker tests
+      run: |
+        make docker_test
+
+    - name: Upload coverage to Codecov
+      if: success()
+      run: |
+        bash <(curl -s https://codecov.io/bash) -X gcov -X coveragepy -f ${{ env.CODECOV_TMP }}/coverage.xml
+
+    - name: Build, tag, and push the image to Amazon ECR
+      id: build-push-lock8
+      env:
+        ECR_LOCK8_REGISTRY: ${{ steps.login-ecr-lock8.outputs.registry }}
+        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+      run: |
+        # Build a docker container and push it to ECR
+        docker build -f Dockerfile -t $ECR_LOCK8_REGISTRY/$ECR_REPOSITORY:$(git rev-parse --short HEAD) --no-cache .
+        echo "Pushing image to ECR..."
+        docker push $ECR_LOCK8_REGISTRY/$ECR_REPOSITORY:$(git rev-parse --short HEAD)

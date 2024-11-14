@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM ubuntu:noble
 
 VOLUME /etc/jd2cw/
 

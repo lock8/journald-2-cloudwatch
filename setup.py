@@ -34,14 +34,14 @@ setup(
     description='Send journald logs to AWS CloudWatch',
     url='https://github.com/lock8/journald-2-cloudwatch',
     packages=('jd2cw',),
-    install_requires=['boto3', 'click'],
+    install_requires=['boto3==2.49.0', 'click==8.1.7'],
     extras_require={
         # Also: git+https://github.com/systemd/python-systemd.git#egg=systemd
         'testing': [
             'pytest', 'pytest-cov', 'requests_mock',
             # Pin botocore to make current tests work.
             # https://github.com/lock8/journald-2-cloudwatch/issues/30.
-            'botocore==1.10.84',
+            'botocore==1.35.60',
         ],
     },
     include_package_data=True,
