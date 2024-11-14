@@ -34,7 +34,7 @@ setup(
     description='Send journald logs to AWS CloudWatch',
     url='https://github.com/lock8/journald-2-cloudwatch',
     packages=('jd2cw',),
-    install_requires=['boto3==2.49.0', 'click==8.1.7'],
+    install_requires=['boto3==1.35.60', 'click==8.1.7'],
     extras_require={
         # Also: git+https://github.com/systemd/python-systemd.git#egg=systemd
         'testing': [
