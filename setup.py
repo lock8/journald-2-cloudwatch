@@ -9,7 +9,7 @@ class VersionFinder(ast.NodeVisitor):
         self.version = None
 
     def visit_Assign(self, node):
-        if node.targets[0].id == 'version':
+        if node.targets[0].id == "version":
             self.version = node.value.s
 
 
@@ -17,7 +17,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 
 def read(*parts):
-    return codecs.open(os.path.join(here, *parts), 'r', encoding='utf8').read()
+    return codecs.open(os.path.join(here, *parts), "r", encoding="utf8").read()
 
 
 def find_version(*parts):
@@ -27,21 +27,20 @@ def find_version(*parts):
 
 
 setup(
-    name='journald-2-cloudwatch',
-    version=find_version('jd2cw', 'version.py'),
-    author='林千里',
-    author_email='lincheney@gmail.com',
-    description='Send journald logs to AWS CloudWatch',
-    url='https://github.com/lock8/journald-2-cloudwatch',
-    packages=('jd2cw',),
-    install_requires=['boto3==1.35.60', 'click==8.1.7'],
+    name="journald-2-cloudwatch",
+    version=find_version("jd2cw", "version.py"),
+    author="Noa backend team",
+    author_email="backend@noa.one",
+    description="Send journald logs to AWS CloudWatch",
+    url="https://github.com/lock8/journald-2-cloudwatch",
+    packages=("jd2cw",),
+    install_requires=[
+        "boto3==1.7.84", "click==8.1.7", "botocore==1.10.84"
+    ],
     extras_require={
         # Also: git+https://github.com/systemd/python-systemd.git#egg=systemd
-        'testing': [
-            'pytest', 'pytest-cov', 'requests_mock',
-            # Pin botocore to make current tests work.
-            # https://github.com/lock8/journald-2-cloudwatch/issues/30.
-            'botocore==1.35.60',
+        "testing": [
+            "pytest", "pytest-cov", "requests-mock==1.8.0",
         ],
     },
     include_package_data=True,
