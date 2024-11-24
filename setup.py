@@ -35,7 +35,7 @@ setup(
     url="https://github.com/lock8/journald-2-cloudwatch",
     packages=("jd2cw",),
     install_requires=[
-        "boto3==1.7.84", "click==8.1.7", "botocore==1.10.84"
+        "boto3==1.35.68", "click==8.1.7", "botocore==1.35.68"
     ],
     extras_require={
         # Also: git+https://github.com/systemd/python-systemd.git#egg=systemd
