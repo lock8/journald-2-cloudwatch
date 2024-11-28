@@ -35,12 +35,13 @@ setup(
     url="https://github.com/lock8/journald-2-cloudwatch",
     packages=("jd2cw",),
     install_requires=[
-        "boto3==1.35.68", "click==8.1.7", "botocore==1.35.68"
+        "boto3==1.9.19",
+        "click==8.1.7",
+        "botocore==1.12.19",
     ],
     extras_require={
-        # Also: git+https://github.com/systemd/python-systemd.git#egg=systemd
         "testing": [
-            "pytest", "pytest-cov", "requests-mock==1.8.0",
+            "pytest==6.2.5", "pytest-cov", "requests-mock==1.8.0",
         ],
     },
     include_package_data=True,
