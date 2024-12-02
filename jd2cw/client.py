@@ -77,34 +77,9 @@ class CloudWatchClient:
             self.client.create_log_group(logGroupName=self.log_group)
         except botocore.exceptions.ClientError as e:
             self.logger.error("Processing problem: %s", e, stack_info=True)
+            self.logger.error(f"Error Code: {e.response['Error']['Code']}", stack_info=True)
             if e.response["Error"]["Code"] != self.ALREADY_EXISTS:
                 raise
-        else:
-            if self.retention > 0:
-                self.client.put_retention_policy(
-                    logGroupName=self.log_group,
-                    retentionInDays=self.retention)
-            if self.subscription_filter_config:
-                destination_arn = self.subscription_filter_config[
-                    "destinationArn"]
-                if destination_arn.split(":", 3)[2] == "lambda":
-                    # if subscription is a lambda we need to set proper,
-                    # permission to cloudwatch.
-                    lambda_client = boto3.client("lambda")
-                    try:
-                        lambda_client.add_permission(
-                            FunctionName=destination_arn,
-                            StatementId="permission_{}".format(self.log_group),
-                            Action="lambda:Invoke",
-                            Principal="logs.{}.amazonaws.com".format(
-                                self.client.meta.config.region_name),
-                        )
-                    except botocore.exceptions.ClientError as e:
-                        self.logger.error("Processing problem: %s", e, stack_info=True)
-                        if e.response["Error"]["Code"] != self.CONFLICT:
-                            raise e
-                self.client.put_subscription_filter(
-                    **self.subscription_filter_config)
 
     def create_log_stream(self, log_stream):
         """ create a log stream, ignoring if it exists """
