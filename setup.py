@@ -1,6 +1,7 @@
 import ast
 import codecs
 import os
+
 from setuptools import setup
 
 
@@ -41,7 +42,7 @@ setup(
     ],
     extras_require={
         "testing": [
-            "pytest==6.2.5", "pytest-cov", "requests-mock==1.8.0",
+            "pytest==6.2.5", "pytest-cov", "requests-mock==1.8.0", "flake8", "isort"
         ],
     },
     include_package_data=True,

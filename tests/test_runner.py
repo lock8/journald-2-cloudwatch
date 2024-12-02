@@ -1,5 +1,5 @@
-from click.testing import CliRunner
 import requests_mock
+from click.testing import CliRunner
 
 
 def test_main_with_arguments(cursor, journal_dir):
@@ -7,12 +7,14 @@ def test_main_with_arguments(cursor, journal_dir):
 
     runner = CliRunner()
     with requests_mock.mock() as m:
-        m.post('https://logs.eu-west-1.amazonaws.com/')
-        result = runner.invoke(main, ['--logs={}'.format(journal_dir),
-                                      '--log-group=foo',
-                                      '--cursor={}'.format(cursor)])
+        m.post("https://logs.eu-west-1.amazonaws.com/")
+        result = runner.invoke(main, [
+            "--logs={}".format(journal_dir),
+            "--log-group=foo",
+            "--cursor={}".format(cursor)
+        ])
     assert result.exit_code == 0, result.output
-    assert result.output == ''
+    assert result.output == ""
 
 
 def test_main_with_config_file(config_file):
@@ -20,7 +22,7 @@ def test_main_with_config_file(config_file):
 
     runner = CliRunner()
     with requests_mock.mock() as m:
-        m.post('https://logs.eu-west-1.amazonaws.com/')
-        result = runner.invoke(main, ['--config={}'.format(config_file)])
+        m.post("https://logs.eu-west-1.amazonaws.com/")
+        result = runner.invoke(main, ["--config={}".format(config_file)])
     assert result.exit_code == 0, result.output
-    assert result.output == ''
+    assert result.output == ""

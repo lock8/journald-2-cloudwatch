@@ -15,3 +15,12 @@ docker_test: docker_build_test
 	  -w $$CODECOV_TMP \
 	  journald-2-cloudwatch-test
 	docker run --rm journald-2-cloudwatch
+
+lint:
+	flake8 ./
+
+isort:
+	isort -c --diff ./
+
+fisort:
+	isort -rc ./

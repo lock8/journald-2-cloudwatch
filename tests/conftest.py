@@ -1,7 +1,6 @@
 import datetime as dt
 import textwrap
 
-
 import botocore.vendored.requests
 import pytest
 import requests_mock.mocker
