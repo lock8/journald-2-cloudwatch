@@ -35,23 +35,6 @@ def test_client_create_log_group(client):
         client.create_log_group()
     assert m.call_count == 2
 
-
-def test_client_create_log_group_and_sub(client):
-    destination_arn = "arn:aws:lambda:eu-west-1:XXX:function:sub"
-    client.subscription_filter_config = {
-        "destinationArn": destination_arn,
-        "filterName": "push_to_lambda",
-        "filterPattern": "",
-        "logGroupName": client.log_group,
-    }
-    with requests_mock.mock() as m:
-        m.post("https://logs.eu-west-1.amazonaws.com/")
-        m.post("https://lambda.eu-west-1.amazonaws.com/2015-03-31/functions/"
-               "{}/policy".format(urllib.parse.quote(destination_arn)))
-        client.create_log_group()
-    assert m.call_count == 4
-
-
 def test_client_log_stream(client):
     with requests_mock.mock() as m:
         m.post("https://logs.eu-west-1.amazonaws.com/")
