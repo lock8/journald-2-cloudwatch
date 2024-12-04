@@ -76,9 +76,10 @@ class CloudWatchClient:
         try:
             self.client.create_log_group(logGroupName=self.log_group)
         except botocore.exceptions.ClientError as e:
-            self.logger.error("Processing problem: %s", e, stack_info=True)
             if "__type" in e.response and e.response["__type"] != self.ALREADY_EXISTS:
-                raise
+                self.logger.warning("Processing problem: %s", e)
+            else:
+                self.logger.error("Processing problem: %s", e, stack_info=True)
 
     def create_log_stream(self, log_stream):
         """ create a log stream, ignoring if it exists """
@@ -88,9 +89,11 @@ class CloudWatchClient:
                 logStreamName=log_stream
             )
         except botocore.exceptions.ClientError as e:
-            self.logger.error("Processing problem: %s", e, stack_info=True)
             if e.response["Error"]["Code"] != self.ALREADY_EXISTS:
+                self.logger.critical("Processing problem: %s", e, stack_info=True)
                 raise
+            else:
+                self.logger.warning("Processing problem: %s", e, stack_info=True)
 
     def log_stream_for(self, msg):
         # docker container
@@ -153,8 +156,8 @@ class CloudWatchClient:
                     **kwargs
                 )
             except botocore.exceptions.ClientError as err:
-                self.logger.error("Processing problem: %s", err, stack_info=True)
                 if (err.response["Error"]["Code"] == "InvalidSequenceTokenException"):
+                    self.logger.warning("Processing problem: %s", err, stack_info=True)
                     # the error message is giving us the expected token
                     seq_token = seq_token_finder(
                         err.response["Error"]["Message"]).group(0)
@@ -165,9 +168,11 @@ class CloudWatchClient:
                         seq_token = self.get_seq_token(log_stream)
                         counter = 0
                 else:
+                    self.logger.error("Processing problem: %s", err, stack_info=True)
                     raise err
             else:
                 break
+
         self.seq_tokens[log_stream] = response["nextSequenceToken"]
 
     def group_messages(
@@ -206,9 +211,11 @@ class CloudWatchClient:
             try:
                 self.put_log_messages(log_stream, messages)
             except botocore.exceptions.ClientError as e:
-                self.logger.error("Processing problem: %s", e, stack_info=True)
                 if e.response["Error"]["Code"] != self.THROTTLED:
+                    self.logger.error("Processing problem: %s", e, stack_info=True)
                     raise
+                else:
+                    self.logger.warning("Processing problem: %s", e, stack_info=True)
             else:
                 break
             time.sleep(1)

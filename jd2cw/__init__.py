@@ -110,9 +110,11 @@ def main(cursor, logs, prefix, log_group, retention, config, verbose: bool):
     cursor = client.load_cursor()
     with systemd.journal.Reader(path=logs) as reader:
         if cursor:
+            logger.info("Current cursor size %d", len(cursor))
             reader.seek_cursor(cursor)
         else:
             # no cursor, start from start of this boot
+            logger.info("No cursor, start from start of this boot")
             reader.this_boot()
             reader.seek_head()
 
@@ -126,4 +128,3 @@ def main(cursor, logs, prefix, log_group, retention, config, verbose: bool):
                     client.log_messages(log_stream, list(messages))
         except KeyboardInterrupt:
             logger.info("Stopping")
-            pass
