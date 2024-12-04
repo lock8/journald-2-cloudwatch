@@ -101,7 +101,7 @@ def main(cursor, logs, prefix, log_group, retention, config, verbose: bool):
         retention = int(retention)
         subscription_filter_config = {}
 
-    logger.info("Target group: %s", log_group)
+    logger.info("Version: %s target group: %s", version, log_group)
     client = CloudWatchClient(
         log_group, cursor, retention, subscription_filter_config
     )
