@@ -33,7 +33,8 @@ def test_client_create_log_group(client):
     with requests_mock.mock() as m:
         m.post("https://logs.eu-west-1.amazonaws.com/")
         client.create_log_group()
-    assert m.call_count == 2
+    assert m.call_count == 1
+
 
 def test_client_log_stream(client):
     with requests_mock.mock() as m:
