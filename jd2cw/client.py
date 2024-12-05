@@ -77,9 +77,9 @@ class CloudWatchClient:
             self.client.create_log_group(logGroupName=self.log_group)
         except botocore.exceptions.ClientError as e:
             if "__type" in e.response and e.response["__type"] != self.ALREADY_EXISTS:
-                self.logger.warning("Processing problem: %s", e)
-            else:
                 self.logger.error("Processing problem: %s", e, stack_info=True)
+            else:
+                self.logger.warning("Processing problem: %s", e)
 
     def create_log_stream(self, log_stream):
         """ create a log stream, ignoring if it exists """

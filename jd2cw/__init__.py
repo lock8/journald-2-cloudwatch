@@ -121,6 +121,7 @@ def main(cursor, logs, prefix, log_group, retention, config, verbose: bool):
         try:
             while True:
                 reader.wait()
+                logger.debug("Logs changed")
                 for log_stream, messages in itertools.groupby(
                         filter(CloudWatchClient.retain_message, reader),
                         key=client.log_stream_for):
