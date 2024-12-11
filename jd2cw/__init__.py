@@ -59,7 +59,7 @@ python_aws_mapping = {
     "--version", is_flag=True, callback=print_version, expose_value=False, is_eager=True
 )
 @click.option(
-    "--verbose", is_flag=True, default=True, help="With debug logs"
+    "--verbose", is_flag=True, default=False, help="With debug logs"
 )
 def main(cursor, logs, prefix, log_group, retention, config, verbose: bool):
     logger = create_logger(debug=verbose)
@@ -120,8 +120,8 @@ def main(cursor, logs, prefix, log_group, retention, config, verbose: bool):
 
         try:
             while True:
-                reader.wait()
-                logger.debug("Logs changed")
+                event_type = reader.wait()
+                logger.debug("Logs changed with event %s", event_type)
                 for log_stream, messages in itertools.groupby(
                         filter(CloudWatchClient.retain_message, reader),
                         key=client.log_stream_for):
