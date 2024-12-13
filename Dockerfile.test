@@ -1,6 +1,6 @@
 FROM journald-2-cloudwatch
 
-RUN source /opt/venv3/bin/activate && pip install requests-mock==1.8.0 botocore==1.10.84 'pytest<7.0' pytest-cov && python3 -c 'import pip,pytest'
+RUN bash -c "source /opt/venv3/bin/activate && pip install requests-mock==1.8.0 botocore==1.10.84 'pytest<7.0' pytest-cov && python3 -c 'import pip,pytest'"
 # botocore==1.10.84 <- is a monkeypatching 6 years old for passing tests in the developing process of release 0.2.0 version
 
-ENTRYPOINT ["python3", "-m", "pytest", "-ocache_dir=/dev/null", "/jd2cw/tests", "-vv", "--cov=jd2cw", "--cov-report=term", "--cov-report=xml:/tmp/codecov/coverage.xml"]
+ENTRYPOINT ["/opt/venv3/bin/python3", "-m", "pytest", "-ocache_dir=/dev/null", "/jd2cw/tests", "-vv", "--cov=jd2cw", "--cov-report=term", "--cov-report=xml:/tmp/codecov/coverage.xml"]
