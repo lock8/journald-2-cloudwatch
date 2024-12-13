@@ -1,7 +1,7 @@
 FROM debian:bookworm
 
 RUN apt update -y
-RUN apt install python3-minimal python3-systemd python3-pip python3-setuptools python3-venv -y
+RUN apt install python3-minimal python3-systemd python3-pip python3-setuptools python3-venv python3-virtualenv virtualenv -y
 
 VOLUME /etc/jd2cw/
 
