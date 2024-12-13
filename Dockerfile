@@ -1,13 +1,9 @@
-FROM ubuntu:focal
+FROM ubuntu:plucky
 
 RUN apt update -y
 RUN apt install python3-minimal python3-systemd python3-pip python3-setuptools python3-venv -y
 
 VOLUME /etc/jd2cw/
-
-ENV DEBIAN_FRONTEND=noninteractive \
-  DEBCONF_NONINTERACTIVE_SEEN=true \
-  PYTHONUNBUFFERED=1
 
 # Create working directory
 RUN mkdir /jd2cw
