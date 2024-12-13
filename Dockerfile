@@ -13,8 +13,8 @@ WORKDIR /jd2cw
 COPY jd2cw /jd2cw/jd2cw
 COPY setup.py /jd2cw/
 # have to be python above 3.10
-RUN python3 --version && python3 -c 'import systemd'"
-RUN pip  --break-system-packages install ./
+RUN python3 --version && python3 -c 'import systemd'
+RUN pip --break-system-packages install ./
 RUN apt-get clean && rm -r ~/.cache && apt autoremove -y --purge && rm -rf /var/lib/apt/lists/*
 
 # Set the entrypoint and default command
