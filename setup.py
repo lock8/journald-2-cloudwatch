@@ -36,13 +36,12 @@ setup(
     url="https://github.com/lock8/journald-2-cloudwatch",
     packages=("jd2cw",),
     install_requires=[
-        "boto3==1.9.19",
-        "click==8.1.7",
-        "botocore==1.12.19",
+        "boto3<1.35.0",
+        "click"
     ],
     extras_require={
         "testing": [
-            "pytest==6.2.5", "pytest-cov", "requests-mock==1.8.0", "flake8", "isort"
+            "pytest", "pytest-cov", "requests-mock", "flake8", "isort"
         ],
     },
     include_package_data=True,

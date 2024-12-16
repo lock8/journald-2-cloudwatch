@@ -1,4 +1,4 @@
-FROM debian:bookworm
+FROM ubuntu:noble
 
 RUN apt update -y
 RUN apt install python3-minimal python3-systemd python3-pip python3-setuptools python3-venv -y
@@ -13,8 +13,8 @@ WORKDIR /jd2cw
 COPY jd2cw /jd2cw/jd2cw
 COPY setup.py /jd2cw/
 # have to be python above 3.10
-RUN python3 --version && python3 -c 'import systemd'
-RUN pip --break-system-packages install ./
+RUN echo 'python version:' && python3 --version && python3 -c 'import systemd'
+RUN pip install ./ --break-system-packages
 RUN apt-get clean && rm -r ~/.cache && apt autoremove -y --purge && rm -rf /var/lib/apt/lists/*
 
 # Set the entrypoint and default command
