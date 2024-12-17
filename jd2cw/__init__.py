@@ -121,11 +121,12 @@ def main(cursor, logs, prefix, log_group, retention, config, verbose: bool):
         try:
             while True:
                 event_type = reader.wait()
-                logger.debug("Logs changed with event %s", event_type)
+                logger.info("Logs changed with event %s", event_type)
                 for log_stream, messages in itertools.groupby(
                         filter(CloudWatchClient.retain_message, reader),
                         key=client.log_stream_for):
-                    logger.info("Updating in '%s'", log_stream, len(messages))
-                    client.log_messages(log_stream, list(messages))
+                    msg_list = list(messages)
+                    logger.info("Updating in '%s' (%d)", log_stream, len(msg_list))
+                    client.log_messages(log_stream, msg_list)
         except KeyboardInterrupt:
             logger.info("Stopping")

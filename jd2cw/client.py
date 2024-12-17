@@ -35,12 +35,12 @@ def create_logger(debug: bool = True) -> logging.Logger:
     if logger is None:
         logger = logging.getLogger()
         if debug:
-            logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-            logger.setLevel(logging.DEBUG)
-            logger.info("Debug mode: on")
-        else:
             logging.basicConfig(stream=sys.stdout, level=logging.INFO)
             logger.setLevel(logging.INFO)
+            logger.info("Debug mode: info")
+        else:
+            logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
+            logger.setLevel(logging.ERROR)
             logger.info("Debug mode: off")
 
     return logger
@@ -145,7 +145,7 @@ class CloudWatchClient:
         MAX_RETRY = 5
         counter = 0
         while True:
-            self.logger.debug(
+            self.logger.info(
                 "Sending %s events %d", self.log_group, len(log_events)
             )
             try:
@@ -238,11 +238,16 @@ class CloudWatchClient:
         self.create_log_stream(log_stream)
 
     @staticmethod
-    def retain_message(message, retention=datetime.timedelta(days=14)):
+    def retain_message(message, retention=datetime.timedelta(days=14)) -> bool:
         """ cloudwatch ignores messages older than 14 days """
-        return (
-            datetime.datetime.now() - message["__REALTIME_TIMESTAMP"] < retention
-        )
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
+        try:
+            age = now - message["__REALTIME_TIMESTAMP"]
+        except Exception as err:
+            logger.critical("Time data error in message: %s %s", err, message)
+            return False
+        else:
+            return age < retention
 
     def save_cursor(self, cursor):
         """ saves the journal cursor to file """
