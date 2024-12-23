@@ -41,7 +41,7 @@ setup(
     ],
     extras_require={
         "testing": [
-            "pytest", "pytest-cov", "requests-mock", "flake8", "isort"
+            "pytest", "pytest-cov", "flake8", "isort", "moto[all]"
         ],
     },
     include_package_data=True,

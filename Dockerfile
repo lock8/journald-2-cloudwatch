@@ -1,4 +1,4 @@
-FROM ubuntu:noble
+FROM python:3.12-slim-bullseye
 
 RUN apt update -y
 RUN apt install python3-minimal python3-systemd python3-pip python3-setuptools python3-venv -y

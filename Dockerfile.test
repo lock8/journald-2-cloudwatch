@@ -1,5 +1,5 @@
 FROM journald-2-cloudwatch
 
-RUN pip install requests-mock 'pytest<8.0' pytest-cov --break-system-packages && python3 -c 'import pip,pytest'
+RUN pip install 'moto[all]' 'pytest<8.0' pytest-cov --break-system-packages && python3 -c 'import pip,pytest'
 
 ENTRYPOINT ["python3", "-m", "pytest", "-ocache_dir=/dev/null", "/jd2cw/tests", "-vv", "--cov=jd2cw", "--cov-report=term", "--cov-report=xml:/tmp/codecov/coverage.xml"]

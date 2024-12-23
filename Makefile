@@ -24,3 +24,6 @@ isort:
 
 fisort:
 	isort -rc ./
+
+test:
+	python3 -m pytest -ocache_dir=/dev/null -vv tests

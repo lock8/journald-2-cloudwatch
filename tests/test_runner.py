@@ -1,31 +1,27 @@
-import pytest
-import requests_mock
 from click.testing import CliRunner
+from moto import mock_aws
 
 
-@pytest.mark.skip(reason="Mock problem with botocore.vendored.requests")
-def test_main_with_arguments(cursor, journal_dir):
+@mock_aws
+def test_main_with_arguments(cursor, journal_dir, setup_env):
     from jd2cw import main
 
     runner = CliRunner()
-    with requests_mock.mock() as m:
-        m.post("https://logs.eu-west-1.amazonaws.com/")
-        result = runner.invoke(main, [
-            "--logs={}".format(journal_dir),
-            "--log-group=foo",
-            "--cursor={}".format(cursor)
-        ])
+
+    result = runner.invoke(main, [
+        "--logs={}".format(journal_dir),
+        "--log-group=foo",
+        "--cursor={}".format(cursor)
+    ])
     assert result.exit_code == 0, result.output
     assert result.output == ""
 
 
-@pytest.mark.skip(reason="Mock problem with botocore.vendored.requests")
-def test_main_with_config_file(config_file):
+@mock_aws
+def test_main_with_config_file(config_file, setup_env):
     from jd2cw import main
 
     runner = CliRunner()
-    with requests_mock.mock() as m:
-        m.post("https://logs.eu-west-1.amazonaws.com/")
-        result = runner.invoke(main, ["--config={}".format(config_file)])
+    result = runner.invoke(main, ["--config={}".format(config_file)])
     assert result.exit_code == 0, result.output
     assert result.output == ""

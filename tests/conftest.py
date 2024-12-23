@@ -1,9 +1,8 @@
 import datetime as dt
+import os
 import textwrap
 
-import botocore.vendored.requests
 import pytest
-import requests_mock.mocker
 import systemd.journal
 
 
@@ -18,11 +17,6 @@ def client(request, cursor):
 @pytest.fixture
 def now():
     return dt.datetime.now()
-
-
-@pytest.fixture(autouse=True, scope='session')
-def mock_vendored_requests():
-    requests_mock.mocker.requests = botocore.vendored.requests
 
 
 @pytest.fixture
@@ -59,3 +53,10 @@ def config_file(tmpdir_factory, cursor, journal_dir):
         open_file.write(config)
 
     return fn.strpath
+
+
+@pytest.fixture(scope="session")
+def setup_env():
+    os.environ["AWS_ACCESS_KEY_ID"] = "testtest"
+    os.environ["AWS_SECRET_ACCESS_KEY"] = "testtest"
+    os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
